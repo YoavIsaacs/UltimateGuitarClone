@@ -1,9 +1,7 @@
 from fastapi import APIRouter, HTTPException
 from app.models.tabs import Tab, TabCreate, TabUpdate
 
-from app.databaseConnection import retrieve_all_tabs, add_tab, update_tab
-
-
+from app.databaseConnection import retrieve_all_tabs, add_tab, update_tab, delete_tab
 
 router = APIRouter(prefix="/tabs")
 
@@ -30,3 +28,11 @@ async def update_tab_in_db(tab_id: str, tab: TabUpdate) -> dict:
     if not updated_tab:
         raise HTTPException(status_code=404, detail="Tab not found")
     return updated_tab
+
+@router.delete("/{tab_id}", response_model=dict)
+async def delete_tab_in_db(tab_id: str) -> dict:
+        deleted = await delete_tab(tab_id)
+
+        if not deleted:
+            raise HTTPException(status_code=404, detail="Tab not found")
+        return {"message": "Tab deleted successfully"}

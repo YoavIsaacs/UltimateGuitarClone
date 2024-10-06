@@ -54,3 +54,12 @@ async def update_tab(tab_id: str, tab_data: dict):
         }
 
     return None
+
+async def delete_tab(tab_id:str) -> bool:
+    if not ObjectId.is_valid(tab_id):
+        return False
+    delete_result = await tab_collection.delete_one(
+        {"_id": ObjectId(tab_id)}
+    )
+
+    return delete_result.deleted_count == 1
