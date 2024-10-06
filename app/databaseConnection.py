@@ -1,8 +1,8 @@
 from motor.motor_asyncio import AsyncIOMotorClient
 from bson import ObjectId
+import os
 
-MONGO_URI = "mongodb://localhost:27017"
-
+MONGO_URI = os.getenv("MONGO_URI", "mongodb://localhost:27017/ultimate_guitar_clone")
 client = AsyncIOMotorClient(MONGO_URI)
 database = client["ultimate_guitar_clone"]
 tab_collection = database.get_collection("tabs")
