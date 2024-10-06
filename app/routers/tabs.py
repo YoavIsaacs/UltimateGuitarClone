@@ -1,16 +1,16 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException
 from ..models.tabs import Tab
+from ..databaseConnection import retrieve_all_tabs
 
 
 router = APIRouter()
 
-# Temporary list of tabs until mongo integration
-tabs = [
-    Tab(id=1, title="Wonderwall", artist="Oasis", content="Chords for Wonderwall..."),
-    Tab(id=2, title="Hotel California", artist="Eagles", content="Chords for Hotel California..."),
-]
 
 @router.get("/tabs", response_model=list[Tab])
-def get_tabs() -> list:
+async def get_tabs() -> list:
+    tabs = await retrieve_all_tabs()
+    if not tabs:
+        raise HTTPException(status_code=404, detail="No tabs found")
     return tabs
+
 
