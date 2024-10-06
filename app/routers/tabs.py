@@ -1,4 +1,6 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Depends
+
+from app.core.dependencies import get_current_user
 from app.models.tabs import Tab, TabCreate, TabUpdate
 
 from app.databaseConnection import retrieve_all_tabs, add_tab, update_tab, delete_tab
@@ -7,7 +9,7 @@ router = APIRouter(prefix="/tabs")
 
 
 @router.get("", response_model=list[Tab])
-async def get_tabs() -> list:
+async def get_tabs(current_user: Depends(get_current_user)) -> list:
     print("in tabs get")
     tabs = await retrieve_all_tabs()
     if not tabs:
