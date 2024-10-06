@@ -1,0 +1,32 @@
+from motor.motor_asyncio import AsyncIOMotorClient
+from bson.objectid import ObjectId
+
+MONGO_URI = "mongodb://localhost:27017"
+
+client = AsyncIOMotorClient(MONGO_URI)
+database = client["ultimate_guitar_clone"]
+tab_collection = database.get_collection("tabs")
+
+
+async def retrieve_all_tabs() -> list:
+    tabs = []
+    async for tab in tab_collection.find():
+        tabs.append({
+            "id": str(tab["_id"]),
+            "title": tab["title"],
+            "artist": tab["artist"],
+            "content": tab["content"]
+        })
+
+    return tabs
+
+
+async def add_tab(tab_data: dict) -> dict:
+    tab = await tab_collection.insert_one(tab_data)
+    new_tab = await tab_collection.find_one({"_id": tab.inserted_id})
+    return {
+        "id": str(new_tab["_id"]),
+        "title": new_tab["title"],
+        "artist": new_tab["artist"],
+        "content": new_tab["content"]
+    }
