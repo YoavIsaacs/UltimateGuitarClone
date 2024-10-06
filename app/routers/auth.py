@@ -1,13 +1,17 @@
 from fastapi import APIRouter, HTTPException, status
+from fastapi.params import Depends
+
+from app.core.dependencies import get_current_user
 from app.models.user import UserCreate, UserInDb
 from app.databaseConnection import database
 from app.utils import get_password_hash, verify_password, create_access_token
 
-router = APIRouter()
+auth_router = APIRouter(dependencies=[Depends(get_current_user)])
 user_collection = database.get_collection("users")
 
-@router.post("/register", status_code=status.HTTP_201_CREATED)
+@auth_router.post("/register", status_code=status.HTTP_201_CREATED)
 async def register_user(user: UserCreate):
+    print("hello")
     existing_user = await user_collection.find_one(
         {"username": user.username}
     )
@@ -28,7 +32,7 @@ async def register_user(user: UserCreate):
         "message": "User created successfully"
     }
 
-@router.post("/login")
+@auth_router.post("/login")
 async def login_user(user: UserCreate):
     existing_user = await user_collection.find_one(
         {"username": user.username}
