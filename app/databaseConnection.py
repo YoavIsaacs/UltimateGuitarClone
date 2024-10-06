@@ -1,4 +1,5 @@
 from motor.motor_asyncio import AsyncIOMotorClient
+from bson import ObjectId
 
 MONGO_URI = "mongodb://localhost:27017"
 
@@ -29,3 +30,27 @@ async def add_tab(tab_data: dict) -> dict:
         "artist": new_tab["artist"],
         "content": new_tab["content"]
     }
+
+async def update_tab(tab_id: str, tab_data: dict):
+    if not ObjectId.is_valid(tab_id):
+        return None
+
+    updated = await tab_collection.update_one(
+        {
+            "_id": ObjectId(tab_id)
+        },
+        {
+            "$set": tab_data
+        }
+    )
+
+    if updated.modified_count == 1:
+        new_tab = await tab_collection.find_one({"_id": ObjectId(tab_id)})
+        return {
+            "id": str(new_tab["_id"]),
+            "title": new_tab["title"],
+            "artist": new_tab["artist"],
+            "content": new_tab["content"],
+        }
+
+    return None
