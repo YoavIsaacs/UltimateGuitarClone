@@ -6,7 +6,7 @@ from app.models.user import UserCreate, UserInDb
 from app.databaseConnection import database
 from app.utils import get_password_hash, verify_password, create_access_token
 
-auth_router = APIRouter(dependencies=[Depends(get_current_user)])
+auth_router = APIRouter()
 user_collection = database.get_collection("users")
 
 @auth_router.post("/register", status_code=status.HTTP_201_CREATED)
@@ -51,10 +51,17 @@ async def login_user(user: UserCreate):
     }
 
 
+@auth_router.get("/get_all_users")
+async def get_all_users():
+    users_cursor = user_collection.find()  # This returns a cursor
+    users = await users_cursor.to_list(length=None)  # Convert the cursor to a list
 
+    # Convert ObjectId to string for each user
+    for user in users:
+        if '_id' in user:
+            user['_id'] = str(user['_id'])
 
-
-
+    return users
 
 
 
